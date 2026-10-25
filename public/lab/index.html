@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SoundPay Jam Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/lab/lab.css">
+</head>
+<body>
+<!-- LAB:BODY -->
+<main class="lab">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="5" cy="12" r="2" fill="currentColor" stroke="none"></circle>
+        <path d="M10 8a6 6 0 0 1 0 8M14 5a10 10 0 0 1 0 14M18 2.5a14 14 0 0 1 0 19"></path>
+      </svg>
+      SoundPay Jam Lab
+    </div>
+  </header>
+  <div class="top" style="display:grid;gap:0.5rem">
+    <h1>Can someone jam a payment made over sound?</h1>
+    <p class="lede">Each run sends a real 16-character payment token through a simulated room, with the same modem
+      code the app uses, and decodes it the way the customer's phone would. Pick how the token is sent, put something
+      in the room, and see whether the payment gets through.</p>
+  </div>
+
+  <div class="grid">
+    <form class="panel" id="controls">
+      <fieldset>
+        <legend class="label">How the terminal sends</legend>
+        <div class="systems" id="systems"></div>
+      </fieldset>
+      <div>
+        <label class="label" for="scenario">What's in the room</label>
+        <select id="scenario"></select>
+      </div>
+      <div class="knob">
+        <div class="knob-head"><label for="knob" id="knob-label">Strength</label><output id="knob-out" for="knob"></output></div>
+        <input type="range" id="knob">
+      </div>
+      <label class="check"><input type="checkbox" id="adaptive" checked>
+        <span>Adaptive hopping and speaker calibration<br><small style="color:var(--muted)">The phone tells the terminal which channels are noisy; the terminal avoids them and boosts tones its speaker plays weakly.</small></span></label>
+      <div class="actions">
+        <button type="button" id="run1">Run 1 payment</button>
+        <button type="button" id="run10" class="quiet">Run 10</button>
+        <button type="button" id="compare" class="quiet">Compare all methods</button>
+      </div>
+    </form>
+
+    <section class="panel" aria-live="polite">
+      <div class="verdict">
+        <span class="pill idle" id="pill">Ready</span>
+        <ul class="facts" id="facts"></ul>
+      </div>
+      <div class="tokens">
+        <span>Sent</span><code id="sent">–</code>
+        <span>Phone got</span><code id="got">–</code>
+      </div>
+      <div class="scope">
+        <div class="yax" aria-hidden="true"><span>20</span><span>19</span><span>18</span><span>17</span><span>16</span><span>15</span><span>14 kHz</span></div>
+        <canvas id="spectro" width="600" height="129" aria-label="Spectrogram of what the phone heard, 14 to 20 kilohertz"></canvas>
+        <div class="xax" id="xax" aria-hidden="true"></div>
+      </div>
+      <div class="actions" style="align-items:center">
+        <button type="button" id="play" class="quiet">Play what the phone heard</button>
+        <p class="scope-note">Mostly above 15 kHz: you'll hear the room and the jammers more than the payment.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="label" id="bars-title">Success rate, this room</div>
+    <div class="bars" id="bars"></div>
+    <p class="empty" id="bars-empty">Run payments or compare all methods to fill this in.</p>
+  </section>
+
+  <section class="panel">
+    <div class="label">Runs this session</div>
+    <div class="log-wrap">
+      <table class="log">
+        <thead><tr><th>Room</th><th>Strength</th><th>Method</th><th>Adaptive</th><th class="num">Paid</th><th class="num">Runs</th></tr></thead>
+        <tbody id="log"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="foot">Simulation, not a recording: white room noise plus modelled interference, ideal tones, no
+    speaker or microphone colouring except in the distance scenario (a laptop speaker 15 dB weaker at 19.5 kHz).
+    Jam tones are twice as strong as the payment's tones. Real rooms and phones will differ; the range-test page in
+    the app measures those.</p>
+</main>
+<!-- /LAB:BODY -->
+<script src="/vendor/ggwave.js"></script>
+<script type="module" src="/lab/lab.js"></script>
+</body>
+</html>

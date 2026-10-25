@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3346E0">
+  <title>SoundPay</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/vendor/ggwave.js"></script>
+  <script src="/vendor/webauthn.js"></script>
+</head>
+<body>
+  <main class="page">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="5" cy="12" r="2" fill="currentColor" stroke="none"/>
+        <path d="M10 8a6 6 0 0 1 0 8M14 5a10 10 0 0 1 0 14M18 2.5a14 14 0 0 1 0 19"/>
+      </svg>
+      SoundPay
+      <span class="who" id="who"></span>
+    </div>
+
+    <div id="error" class="notice error" hidden style="margin-bottom:1rem"></div>
+
+    <!-- New on this phone -->
+    <section id="v-signup" class="stack" hidden>
+      <h1>Pay at the counter with your phone</h1>
+      <p class="muted">Your phone listens for the terminal, shows you the amount, and you approve with your fingerprint or face.</p>
+      <form id="signup-form" class="stack">
+        <div>
+          <label for="name">Your name</label>
+          <input id="name" autocomplete="name" required maxlength="60">
+        </div>
+        <button type="submit">Create account with a passkey</button>
+      </form>
+      <button class="link" id="signin" type="button">I already have an account on this phone</button>
+    </section>
+
+    <!-- Add a card -->
+    <section id="v-card" class="stack" hidden>
+      <h1>Add a card</h1>
+      <p class="muted" id="card-intro"></p>
+      <div id="card-element"></div>
+      <button id="card-save" type="button">Save card</button>
+    </section>
+
+    <!-- Ready -->
+    <section id="v-ready" class="stack" hidden>
+      <button class="pay-big" id="pay" type="button">Pay</button>
+      <p class="muted small" style="text-align:center">Tap, then hold your phone near the terminal.</p>
+      <p class="small" style="text-align:center;margin-top:2rem">
+        <span id="ready-card"></span><br>
+        <button class="link" id="signout" type="button">Sign out</button>
+      </p>
+    </section>
+
+    <!-- Listening -->
+    <section id="v-listen" class="stack" hidden>
+      <h1>Listening…</h1>
+      <p class="muted">Hold your phone near the terminal's speaker.</p>
+      <canvas class="band" id="l-band" aria-label="Live sound your phone is hearing"></canvas>
+      <div class="band-caption"><span>14 kHz</span><span>what your phone hears</span><span>21 kHz</span></div>
+      <div class="meter" id="l-meter-box" aria-live="polite">
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="small" id="l-meter">Listening…</span>
+      </div>
+      <p class="small muted" id="l-mode" style="margin:0"></p>
+      <div id="l-hint" class="notice info small" hidden>Can't hear the terminal? Scan the QR code on its screen with your camera, or type the code below.</div>
+      <form id="manual-form" class="stack" style="margin-top:1.5rem">
+        <label for="manual">Or type the code shown on the terminal</label>
+        <div class="row">
+          <input id="manual" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="abcd efgh jkmn pqrs" style="flex:3">
+          <button type="submit" class="quiet" style="flex:1">Go</button>
+        </div>
+      </form>
+      <button class="quiet" id="l-cancel" type="button">Cancel</button>
+    </section>
+
+    <!-- Confirm -->
+    <section id="v-confirm" class="stack" hidden>
+      <p class="muted" style="margin:0">Pay <span id="k-merchant"></span></p>
+      <div class="amount" id="k-amount"></div>
+      <div class="match"><span>Check the terminal shows</span><b id="k-code"></b></div>
+      <button class="quiet" id="k-speak" type="button">Read this aloud</button>
+      <p class="small muted">If the code doesn't match, tap Cancel. Someone else's terminal may be nearby.</p>
+      <div class="timer" aria-hidden="true"><span id="k-timer"></span></div>
+      <button id="k-approve" type="button"></button>
+      <button class="quiet" id="k-cancel" type="button">Cancel</button>
+      <p class="small muted" style="text-align:center" id="k-card"></p>
+    </section>
+
+    <!-- Result -->
+    <section id="v-result" class="stack" hidden>
+      <div class="result" id="r-box">
+        <h1 id="r-title"></h1>
+        <div class="amount" id="r-amount"></div>
+        <p id="r-detail" style="margin:0"></p>
+      </div>
+      <button id="r-done" type="button">Done</button>
+    </section>
+  </main>
+
+  <script type="module" src="/pay.js"></script>
+</body>
+</html>

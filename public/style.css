@@ -1,0 +1,285 @@
+:root {
+  --fog: #EEF2F6;
+  --paper: #FFFFFF;
+  --ink: #172038;
+  --muted: #5B6680;
+  --line: #D3DAE5;
+  --signal: #3346E0;
+  --signal-soft: #E3E7FD;
+  --paid: #12805C;
+  --paid-soft: #DDF3EA;
+  --stop: #B43C1E;
+  --stop-soft: #FBE6DF;
+
+  --display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fog: #121A2E;
+    --paper: #1A2440;
+    --ink: #E8ECF6;
+    --muted: #9AA6C2;
+    --line: #2C3858;
+    --signal: #8C9BFF;
+    --signal-soft: #252F5C;
+    --paid: #4CD3A0;
+    --paid-soft: #173B32;
+    --stop: #FF8A6B;
+    --stop-soft: #40221B;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--fog);
+  color: var(--ink);
+  font: 400 1.0625rem/1.5 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+[hidden] { display: none !important; }
+
+h1, h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 0.5rem;
+}
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.375rem; }
+
+p { margin: 0 0 1rem; }
+.muted { color: var(--muted); }
+.small { font-size: 0.9375rem; }
+
+/* ---------------------------------------------------------------- layout */
+
+.page {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+.page.wide { max-width: 64rem; }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+}
+.brand svg { width: 1.5rem; height: 1.5rem; color: var(--signal); }
+.brand .who { margin-left: auto; font: 400 0.9375rem var(--body); color: var(--muted); }
+
+.stack > * + * { margin-top: 0.75rem; }
+
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+/* ---------------------------------------------------------------- the big numbers */
+
+.amount {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.75rem, 11vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.match {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
+  background: var(--signal-soft);
+  color: var(--ink);
+}
+.match b {
+  font-family: var(--display);
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--signal);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- the spectrum strip */
+
+.band {
+  display: block;
+  width: 100%;
+  height: 88px;
+  border-radius: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.band-caption {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  margin-top: 0.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- countdown */
+
+.timer {
+  height: 6px;
+  border-radius: 6px;
+  background: var(--line);
+  overflow: hidden;
+}
+.timer > span {
+  display: block;
+  height: 100%;
+  background: var(--signal);
+  transform-origin: left;
+}
+
+/* ---------------------------------------------------------------- controls */
+
+button, .button {
+  appearance: none;
+  border: 0;
+  border-radius: 14px;
+  padding: 0.95rem 1.25rem;
+  font: 700 1.0625rem var(--body);
+  cursor: pointer;
+  width: 100%;
+  background: var(--signal);
+  color: #fff;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+@media (prefers-color-scheme: dark) {
+  button, .button { color: #10153A; }
+}
+button.quiet {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+button.link {
+  background: none;
+  color: var(--signal);
+  padding: 0.5rem 0;
+  width: auto;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+button:disabled { opacity: 0.55; cursor: progress; }
+
+button.pay-big {
+  padding: 2.25rem 1rem;
+  font: 700 1.75rem var(--display);
+  border-radius: 24px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--signal);
+  outline-offset: 3px;
+}
+
+label { display: block; font-weight: 700; margin-bottom: 0.35rem; }
+
+input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1.0625rem var(--body);
+}
+input.amount-input {
+  font: 700 2.5rem var(--display);
+  padding: 0.75rem 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.row { display: flex; gap: 0.75rem; }
+.row > * { flex: 1; }
+
+/* ---------------------------------------------------------------- status messages */
+
+.notice {
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  font-size: 0.9375rem;
+}
+.notice.error { background: var(--stop-soft); color: var(--stop); }
+.notice.info  { background: var(--signal-soft); }
+
+.result {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-radius: 20px;
+}
+.result.paid   { background: var(--paid-soft); }
+.result.failed { background: var(--stop-soft); }
+.result h1 { font-size: 2.5rem; }
+.result.paid h1   { color: var(--paid); }
+.result.failed h1 { color: var(--stop); }
+
+.token {
+  font-family: var(--display);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- POS two-column */
+
+.pos-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+@media (min-width: 52rem) {
+  .pos-grid { grid-template-columns: 1.3fr 1fr; }
+}
+
+#card-element { min-height: 3rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .timer > span { transition: none !important; }
+}
+
+/* QR fallback on the POS: always dark-on-white so every camera reads it, in light and dark mode */
+.fallback { display: flex; gap: 1rem; align-items: center; margin-top: 1rem; }
+.qr { flex: 0 0 7.5rem; width: 7.5rem; aspect-ratio: 1; background: #fff; border-radius: 8px; padding: 2px; }
+.qr svg { display: block; width: 100%; height: 100%; }
+
+/* Signal meter on the phone */
+.meter { display: flex; align-items: center; gap: 0.75rem; min-height: 1.75rem; }
+.bars { display: inline-flex; align-items: flex-end; gap: 3px; height: 1.25rem; }
+.bars i { width: 6px; background: var(--line); border-radius: 2px; }
+.bars i:nth-child(1) { height: 25%; } .bars i:nth-child(2) { height: 50%; }
+.bars i:nth-child(3) { height: 75%; } .bars i:nth-child(4) { height: 100%; }
+.bars i.on { background: var(--signal); }
+.meter.warn .bars i.on { background: var(--stop); }
+
+/* Range-test results */
+.results { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.results th, .results td { text-align: left; padding: 0.35rem 0.25rem; border-bottom: 1px solid var(--line); font-size: 0.9375rem; }
+.results th { color: var(--muted); font-weight: 400; }

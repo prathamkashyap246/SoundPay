@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SoundPay Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/vendor/ggwave.js"></script>
+</head>
+<body>
+  <main class="page wide">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="5" cy="12" r="2" fill="currentColor" stroke="none"/>
+        <path d="M10 8a6 6 0 0 1 0 8M14 5a10 10 0 0 1 0 14M18 2.5a14 14 0 0 1 0 19"/>
+      </svg>
+      SoundPay Terminal
+      <span class="who" id="merchant"></span>
+    </div>
+
+    <!-- Sign in with the POS key from .env -->
+    <section id="v-login" hidden>
+      <form id="login-form" class="panel stack" style="max-width: 26rem">
+        <h1>Open the terminal</h1>
+        <div>
+          <label for="pos-key">Terminal key</label>
+          <input id="pos-key" type="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit">Open terminal</button>
+        <div id="login-error" class="notice error" hidden></div>
+      </form>
+    </section>
+
+    <!-- Type an amount -->
+    <section id="v-amount" hidden>
+      <form id="amount-form" class="panel stack" style="max-width: 26rem">
+        <h1>New sale</h1>
+        <div>
+          <label for="amount">Amount (₹)</label>
+          <input id="amount" class="amount-input" inputmode="decimal" autocomplete="off" placeholder="0.00" required>
+        </div>
+        <button type="submit">Charge</button>
+        <div id="amount-error" class="notice error" hidden></div>
+      </form>
+    </section>
+
+    <!-- Broadcasting / waiting -->
+    <section id="v-charging" hidden>
+      <div class="pos-grid">
+        <div class="panel">
+          <p class="muted" style="margin:0">Amount due</p>
+          <div class="amount" id="c-amount"></div>
+          <div class="match"><span>Code on customer's phone</span><b id="c-code"></b></div>
+          <p id="c-status" style="margin:1.25rem 0 0.75rem">Customer: tap Pay and hold your phone near this screen.</p>
+          <div class="timer" aria-hidden="true"><span id="c-timer"></span></div>
+        </div>
+        <div class="stack">
+          <canvas class="band" id="c-band" aria-label="Live sound signal from this terminal"></canvas>
+          <div class="band-caption"><span>14 kHz</span><span>sound leaving this terminal</span><span>21 kHz</span></div>
+          <p class="small muted" id="c-mode" style="margin:0.25rem 0 0"></p>
+          <div class="fallback">
+            <div class="qr" id="c-qr" aria-label="QR code for this payment"></div>
+            <p class="small muted" style="margin:0">Phone can't hear it? Scan this with the phone's camera, or type:<br>
+              <span class="token" id="c-token"></span></p>
+          </div>
+          <button class="quiet" id="c-cancel" type="button">Cancel sale</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Outcome -->
+    <section id="v-done" hidden>
+      <div style="max-width: 32rem">
+        <div class="result" id="d-box">
+          <h1 id="d-title"></h1>
+          <div class="amount" id="d-amount"></div>
+          <p id="d-detail" style="margin:0"></p>
+        </div>
+        <div class="row" style="margin-top:1rem">
+          <button id="d-retry" class="quiet" type="button" hidden>Charge again</button>
+          <button id="d-new" type="button">New sale</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/vendor/qrcode.js"></script>
+  <script type="module" src="/pos.js"></script>
+</body>
+</html>

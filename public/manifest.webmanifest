@@ -1,0 +1,8 @@
+{
+  "name": "SoundPay",
+  "short_name": "SoundPay",
+  "start_url": "/pay.html",
+  "display": "standalone",
+  "background_color": "#EEF2F6",
+  "theme_color": "#3346E0"
+}

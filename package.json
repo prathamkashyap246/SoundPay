@@ -1,0 +1,26 @@
+{
+  "name": "soundpay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --no-warnings --test test/*.test.js",
+    "test:browser": "node test/browser/e2e.mjs hop && node test/browser/e2e.mjs hop 0.25 && node test/browser/e2e.mjs both && node test/browser/e2e.mjs ggwave && node test/browser/e2e.mjs qr && HOP_PROFILE=robust node test/browser/e2e.mjs hop follower32 && node test/browser/rangetest.mjs",
+    "sim": "node tools/hopsim/sim-attacks.js 100 && node tools/hopsim/sim-noise.js 100",
+    "start": "node --no-warnings --env-file-if-exists=.env server/index.js",
+    "demo": "node tools/demo.mjs",
+    "build:lab": "node tools/build-lab.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@simplewebauthn/browser": "^14.0.0",
+    "@simplewebauthn/server": "^14.0.3",
+    "express": "^5.3.0",
+    "ggwave": "^0.4.0",
+    "qrcode-generator": "^1.4.4",
+    "stripe": "^23.0.1"
+  }
+}

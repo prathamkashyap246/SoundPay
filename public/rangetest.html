@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3346E0">
+  <title>SoundPay range test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/vendor/ggwave.js"></script>
+</head>
+<body>
+  <main class="page">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="5" cy="12" r="2" fill="currentColor" stroke="none"/>
+        <path d="M10 8a6 6 0 0 1 0 8M14 5a10 10 0 0 1 0 14M18 2.5a14 14 0 0 1 0 19"/>
+      </svg>
+      SoundPay range test
+    </div>
+
+    <div id="error" class="notice error" hidden style="margin-bottom:1rem"></div>
+
+    <!-- Operator sign-in (both devices) -->
+    <section id="v-login" class="stack" hidden>
+      <h1>Range test and speaker calibration</h1>
+      <p class="muted">Open this page on the terminal and on a phone. Both sign in with the POS key.</p>
+      <form id="login-form" class="stack">
+        <div>
+          <label for="pos-key">POS key</label>
+          <input id="pos-key" type="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit">Sign in</button>
+      </form>
+    </section>
+
+    <!-- Pick a role -->
+    <section id="v-role" class="stack" hidden>
+      <h1>Which device is this?</h1>
+      <button id="as-terminal" type="button">The terminal (plays test frames)</button>
+      <button id="as-phone" class="quiet" type="button">The phone (measures)</button>
+      <p class="small muted" id="profile-line"></p>
+    </section>
+
+    <!-- Terminal -->
+    <section id="v-terminal" class="stack" hidden>
+      <h1>Terminal</h1>
+      <p class="muted">Plays a test frame every cycle, exactly like a real sale. Leave it running while you
+        measure with the phone.</p>
+      <button id="t-toggle" type="button">Start test broadcast</button>
+      <p class="small" id="t-status">Stopped.</p>
+      <canvas class="band" id="t-band" aria-label="Live sound signal from this terminal"></canvas>
+      <div class="band-caption"><span>14 kHz</span><span>sound leaving this terminal</span><span>21 kHz</span></div>
+      <div class="panel stack">
+        <b>Link settings in force</b>
+        <p class="small muted" id="t-link" style="margin:0">…</p>
+        <button id="t-reset" class="quiet" type="button">Reset speaker calibration</button>
+      </div>
+    </section>
+
+    <!-- Phone -->
+    <section id="v-phone" class="stack" hidden>
+      <h1>Phone</h1>
+      <p class="muted">Start the terminal's test broadcast first. Then stand at a distance, type it, and record.</p>
+      <div class="row">
+        <input id="p-distance" inputmode="decimal" placeholder="Distance in metres, e.g. 0.5" style="flex:2">
+        <button id="p-record" type="button" style="flex:1">Record 20 s</button>
+      </div>
+      <div class="meter" id="l-meter-box" aria-live="polite">
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="small" id="l-meter">Not listening</span>
+      </div>
+      <p class="small" id="p-live">—</p>
+      <div class="panel stack">
+        <b>Results</b>
+        <table class="results" id="p-results">
+          <thead><tr><th>metres</th><th>heard</th><th>success</th><th>SNR</th><th>erasures</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <button id="p-copy" class="quiet" type="button">Copy as CSV</button>
+      </div>
+      <div class="panel stack">
+        <b>Speaker calibration</b>
+        <p class="small muted" style="margin:0">Hold the phone 10–20 cm in front of the terminal's speaker, in a quiet
+          moment. Takes about 6 frames. The terminal then boosts the tones its speaker plays weakly and skips the
+          ones it can't play.</p>
+        <button id="p-calibrate" type="button">Calibrate speaker</button>
+        <p class="small" id="p-cal-status"></p>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/rangetest.js"></script>
+</body>
+</html>
