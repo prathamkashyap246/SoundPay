@@ -16,7 +16,7 @@ play token over sound ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~▶ hears token
                              verify passkey
                              claim token (once, atomically)
                              charge card (Stripe / mock)
-"Paid by Som K." ◀── live event ─────
+"Paid by Pratham." ◀── live event ─────
 ```
 
 **Contents:** [Quick start](#quick-start) · [Real phone](#use-a-real-phone) · [Stripe](#stripe-test-mode) ·
