@@ -233,7 +233,7 @@ docs/
 
 ## Known limitations
 
-This is a working prototype. Fix these before handling real money.
+This is a working prototype. In the time of scaling, we plan to fix these before handling real money : 
 
 **Scaling and payments**
 - Pending passkey challenges and rate limits live in memory, so run one server process. Move them to Redis or
@@ -244,10 +244,10 @@ This is a working prototype. Fix these before handling real money.
 
 **Audio**
 - Some people (mostly under 25) can faintly hear 15 kHz. ggwave's ultrasonic mode starts there.
-- Cheap laptop speakers vary a lot above 16 kHz. Calibrate on the actual laptop (`/rangetest.html`) and keep
+- Cheap laptop speakers vary a lot above 16 kHz. We can calibrate on the actual laptop (`/rangetest.html`) and keep
   the QR / typed-code fallback.
 - The hop modem has only been tested in simulation and in headless Chromium. Real speakers, microphones and
-  rooms are untested: try it on your own laptop and phones, and keep `AUDIO_MODE=both` or `ggwave` handy.
+  rooms are untested:We should try it on our/your own laptop and phones, and keep `AUDIO_MODE=both` or `ggwave` handy.
 - A fast-moving jammer (one strong decoy tone that changes every few tens of ms, or a follower) defeats
   ggwave and the `fast` and `range` profiles. Use `HOP_PROFILE=robust` where that's a threat. See "What it
   does not stop" in [docs/HOPMODEM.md](docs/HOPMODEM.md).
