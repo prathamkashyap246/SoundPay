@@ -12,7 +12,7 @@ The token travels over a **keyed frequency-hopping acoustic modem** built for th
 
 *Recorded live on a laptop and a phone. The spectrogram shows the payment tone hopping across channels.*
 
-**Demo video:** [link to video, or add `docs/demo.mp4`]
+**Demo video:** [Watch the demo](docs/screenshots/draft-2.mp4)
 
 **Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Quick start](#quick-start) · [Real phone](#use-a-real-phone) · [Stripe](#stripe-test-mode) · [Sound modes](#sound-modes) · [Testing](#testing) · [Security](#security-design) · [Structure](#project-structure) · [Limitations](#known-limitations) · [Credits](#credits)
 
@@ -268,10 +268,10 @@ This is a working prototype. Before handling real money, these need fixing:
 
 - **Team:** Pratham Kashyap, Sparsh Som, Praguna Krishna, Tanay
 - **Data-over-sound base and passkey approval flow:** Sparsh Som's original SoundPay, built on [ggwave](https://github.com/ggerganov/ggwave) by Georgi Gerganov.
-- **Frequency-hopping modem, adaptive hopping, Jam Lab and simulations:** [your name / exactly what you wrote].
-- Thanks to [organizers / host institution] and everyone at Confluence.
+- **Frequency-hopping modem, adaptive hopping, Jam Lab and simulations:** Pratham Kashyap.
+- Thanks to everyone at Confluence.
 
 ## License
 
-ISC (see `package.json`). Add a `LICENSE` file before publishing. ggwave is MIT-licensed.
+MIT (see [LICENSE](LICENSE)). ggwave is also MIT-licensed.
 >>>>>>> 907804a (SoundPay: frequency-hopping acoustic payments)
