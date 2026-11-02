@@ -12,7 +12,7 @@ The token travels over a **keyed frequency-hopping acoustic modem** built for th
 
 *Recorded live on a laptop and a phone. The spectrogram shows the payment tone hopping across channels.*
 
-**Demo video:** [Watch the demo](docs/screenshots/draft-2.mp4)
+**Demo video:** [Watch the demo](https://github.com/prathamkashyap246/SoundPay/raw/main/docs/screenshots/draft-2.mp4)
 
 **Contents:** [Demo](#demo) · [How it works](#how-it-works) · [Quick start](#quick-start) · [Real phone](#use-a-real-phone) · [Stripe](#stripe-test-mode) · [Sound modes](#sound-modes) · [Testing](#testing) · [Security](#security-design) · [Structure](#project-structure) · [Limitations](#known-limitations) · [Credits](#credits)
 
