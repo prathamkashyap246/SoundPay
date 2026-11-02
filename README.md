@@ -267,7 +267,7 @@ This is a working prototype. Before handling real money, these need fixing:
 ## Credits
 
 - **Team:** Pratham Kashyap, Sparsh Som, Praguna Krishna, Tanay
-- **Data-over-sound base and passkey approval flow:** [friend's name]'s original SoundPay, built on [ggwave](https://github.com/ggerganov/ggwave) by Georgi Gerganov.
+- **Data-over-sound base and passkey approval flow:** Sparsh Som's original SoundPay, built on [ggwave](https://github.com/ggerganov/ggwave) by Georgi Gerganov.
 - **Frequency-hopping modem, adaptive hopping, Jam Lab and simulations:** [your name / exactly what you wrote].
 - Thanks to [organizers / host institution] and everyone at Confluence.
 
