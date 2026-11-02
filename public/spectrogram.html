@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SoundPay · Live Hop Spectrogram</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --panel: #13151c;
+      --border: #232733;
+      --text: #e8eaf0;
+      --muted: #7d8394;
+      --accent: #4ade80;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 24px 12px;
+      background: radial-gradient(ellipse at 50% 0%, #161a26 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    header { text-align: center; }
+    h1 { margin: 0; font-size: 1.3rem; font-weight: 600; letter-spacing: 0.01em; }
+
+    /* status pill */
+    #pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--panel);
+      font-size: 0.8rem;
+      color: var(--muted);
+      transition: color 0.4s, border-color 0.4s;
+    }
+    #dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4b5163;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    #pill.live { color: var(--text); border-color: #2a4a38; }
+    #pill.live #dot {
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    #pill.error #dot { background: #f87171; }
+    @keyframes pulse { 50% { opacity: 0.45; } }
+
+    /* panels */
+    .card {
+      width: min(96vw, 1040px);
+      padding: 16px 16px 16px 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    }
+    .plot { position: relative; padding-left: 72px; }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 340px;
+      background: #000;
+      border-radius: 6px;
+    }
+    .axis {
+      position: absolute;
+      left: 0; top: 0;
+      width: 64px; height: 340px;
+    }
+    .axis span {
+      position: absolute;
+      right: 0;
+      transform: translateY(50%);
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .grid-card { padding-left: 72px; padding-top: 14px; padding-bottom: 14px; }
+    .grid-title {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    #readout {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      transition: opacity 0.3s;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(48, 1fr);
+      gap: 3px;
+    }
+    .cell {
+      height: 15px;
+      border-radius: 3px;
+      background: rgb(28, 31, 40);
+    }
+
+    button {
+      padding: 11px 34px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #05210f;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.25s, opacity 0.3s, background 0.3s;
+      box-shadow: 0 4px 18px rgba(74, 222, 128, 0.25);
+    }
+    button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(74, 222, 128, 0.4); }
+    button:active:not(:disabled) { transform: translateY(1px); }
+    button:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>SoundPay · Live Hop Spectrogram</h1>
+    <div id="pill"><span id="dot"></span><span id="status">Press Start and allow microphone access</span></div>
+  </header>
+
+  <div class="card">
+    <div class="plot">
+      <div class="axis" id="axis"></div>
+      <canvas id="spec"></canvas>
+    </div>
+  </div>
+
+  <div class="card grid-card">
+    <div class="grid-title">
+      <span>96 hop channels</span>
+      <span id="readout">idle</span>
+    </div>
+    <div id="grid"></div>
+  </div>
+
+  <button id="start">Start</button>
+
+<script>
+  // ---- Modem settings (match modem.js) -------------------------------------
+  const SAMPLE_RATE = 48000;
+  const BASE_HZ = 15000;          // channel 0
+  const STEP_HZ = 46.875;         // spacing between channels
+  const NCH = 96;
+
+  // ---- Display settings ------------------------------------------------------
+  const MIN_HZ = 14500;           // bottom of the plot
+  const MAX_HZ = 20000;           // top of the plot
+  const SCROLL_SPEED = 180;       // CSS pixels per second (same on every screen)
+  const FFT_SIZE = 2048;
+  const SMOOTHING = 0.2;          // keep low: higher values smear the 64 ms hops
+  const AXIS_STEPS = 11;          // a label every 0.5 kHz
+
+  // ---- Channel detection -----------------------------------------------------
+  const LEVEL_MIN = 90;           // lower this if the grid never lights up
+  const MARGIN = 35;              // raise this if it flickers on room noise
+  const GLOW_DECAY_MS = 450;      // how long a lit channel takes to fade
+  const IDLE_MS = 700;            // silence before the readout says "listening"
+
+  // ---- Elements ------------------------------------------------------------
+  const canvas = document.getElementById('spec');
+  const ctx = canvas.getContext('2d', { willReadFrequently: false });
+  const pillEl = document.getElementById('pill');
+  const statusEl = document.getElementById('status');
+  const readoutEl = document.getElementById('readout');
+  const startBtn = document.getElementById('start');
+  const axisEl = document.getElementById('axis');
+  const gridEl = document.getElementById('grid');
+
+  // ---- Axis labels -----------------------------------------------------------
+  for (let i = 0; i <= AXIS_STEPS; i++) {
+    const hz = MIN_HZ + (i / AXIS_STEPS) * (MAX_HZ - MIN_HZ);
+    const label = document.createElement('span');
+    label.textContent = (hz / 1000).toFixed(1) + ' kHz';
+    label.style.bottom = (i / AXIS_STEPS) * 100 + '%';
+    axisEl.appendChild(label);
+  }
+
+  // ---- Channel grid ----------------------------------------------------------
+  const BASE_RGB = [28, 31, 40], ACCENT_RGB = [74, 222, 128];
+  const cells = [], glow = new Float32Array(NCH), painted = new Float32Array(NCH);
+  for (let m = 0; m < NCH; m++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.title = 'Channel ' + m + ' · ' + ((BASE_HZ + m * STEP_HZ) / 1000).toFixed(2) + ' kHz';
+    gridEl.appendChild(cell);
+    cells.push(cell);
+  }
+
+  function paintCell(m, g) {
+    const mix = c => Math.round(BASE_RGB[c] + (ACCENT_RGB[c] - BASE_RGB[c]) * g);
+    cells[m].style.background = `rgb(${mix(0)},${mix(1)},${mix(2)})`;
+    cells[m].style.boxShadow = g > 0.5 ? `0 0 ${(g * 9).toFixed(1)}px rgba(74,222,128,${(g * 0.65).toFixed(2)})` : 'none';
+  }
+
+  // ---- Colour map (black > indigo > magenta > orange > pale yellow) ---------
+  const STOPS = [
+    [0.00, [0, 0, 4]], [0.20, [40, 11, 84]], [0.40, [120, 28, 109]],
+    [0.60, [212, 72, 66]], [0.80, [251, 155, 6]], [1.00, [252, 255, 164]],
+  ];
+  const LUT = new Uint8ClampedArray(256 * 3);
+  for (let i = 0; i < 256; i++) {
+    const t = Math.max(0, (i - 25) / 230);          // quiet noise stays black
+    let s = 0;
+    while (s < STOPS.length - 2 && t > STOPS[s + 1][0]) s++;
+    const [t0, c0] = STOPS[s], [t1, c1] = STOPS[s + 1];
+    const f = Math.min(1, (t - t0) / (t1 - t0));
+    for (let c = 0; c < 3; c++) LUT[i * 3 + c] = c0[c] + (c1[c] - c0[c]) * f;
+  }
+
+  // ---- Canvas sizing (sharp on high-DPI screens) -------------------------------
+  let W, H, dpr, col, rowIdx, rowFrac, hzPerBinCache = 0;
+
+  function sizeCanvas() {
+    dpr = window.devicePixelRatio || 1;
+    W = Math.max(1, Math.round(canvas.clientWidth * dpr));
+    H = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    canvas.width = W;
+    canvas.height = H;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+    col = ctx.createImageData(1, H);
+    if (hzPerBinCache) buildRows(hzPerBinCache);
+  }
+
+  // For every pixel row, which FFT bins to blend (smooth vertical gradient)
+  function buildRows(hzPerBin) {
+    hzPerBinCache = hzPerBin;
+    rowIdx = new Int32Array(H);
+    rowFrac = new Float32Array(H);
+    for (let y = 0; y < H; y++) {
+      const p = 1 - (y + 0.5) / H;
+      const b = (MIN_HZ + p * (MAX_HZ - MIN_HZ)) / hzPerBin;
+      rowIdx[y] = Math.floor(b);
+      rowFrac[y] = b - rowIdx[y];
+    }
+  }
+
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  // ---- Main loop -------------------------------------------------------------
+  function startSpectrogram(stream) {
+    const audioCtx = new AudioContext({ sampleRate: SAMPLE_RATE });
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = FFT_SIZE;
+    analyser.smoothingTimeConstant = SMOOTHING;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+
+    const bins = new Uint8Array(analyser.frequencyBinCount);
+    const hzPerBin = audioCtx.sampleRate / FFT_SIZE;
+    buildRows(hzPerBin);
+
+    const channelBin = Array.from({ length: NCH }, (_, m) =>
+      Math.round((BASE_HZ + m * STEP_HZ) / hzPerBin));
+
+    let last = performance.now(), scrollAcc = 0;
+    let currentCh = -1, lastHit = 0;
+
+    function detectChannel() {
+      let best = -1, bestLevel = 0, sum = 0;
+      for (let m = 0; m < NCH; m++) {
+        const b = channelBin[m];
+        const level = Math.max(bins[b - 1], bins[b], bins[b + 1]);
+        sum += level;
+        if (level > bestLevel) { bestLevel = level; best = m; }
+      }
+      return (bestLevel >= LEVEL_MIN && bestLevel - sum / NCH >= MARGIN) ? best : -1;
+    }
+
+    function frame(now) {
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      analyser.getByteFrequencyData(bins);
+
+      // 1) spectrogram: scroll by elapsed time, not by frame count
+      scrollAcc += SCROLL_SPEED * dpr * dt;
+      const n = Math.floor(scrollAcc);
+      scrollAcc -= n;
+      if (n > 0) {
+        ctx.drawImage(canvas, -n, 0);
+        const d = col.data;
+        for (let y = 0; y < H; y++) {
+          const i0 = rowIdx[y], f = rowFrac[y];
+          const v = bins[i0] * (1 - f) + bins[i0 + 1] * f;
+          const li = (v | 0) * 3, o = y * 4;
+          d[o] = LUT[li]; d[o + 1] = LUT[li + 1]; d[o + 2] = LUT[li + 2]; d[o + 3] = 255;
+        }
+        for (let k = 0; k < n; k++) ctx.putImageData(col, W - n + k, 0);
+      }
+
+      // 2) channel grid: instant light-up, smooth fade-out
+      const ch = detectChannel();
+      if (ch >= 0) {
+        glow[ch] = 1;
+        lastHit = now;
+        if (ch !== currentCh) {
+          currentCh = ch;
+          readoutEl.textContent = 'channel ' + ch + ' · ' + ((BASE_HZ + ch * STEP_HZ) / 1000).toFixed(2) + ' kHz';
+        }
+      } else if (currentCh >= 0 && now - lastHit > IDLE_MS) {
+        currentCh = -1;
+        readoutEl.textContent = 'listening…';
+      }
+      const decay = Math.exp(-dt * 1000 / GLOW_DECAY_MS);
+      for (let m = 0; m < NCH; m++) {
+        if (glow[m] > 0) {
+          glow[m] = glow[m] < 0.01 ? 0 : glow[m] * decay;
+          if (Math.abs(glow[m] - painted[m]) > 0.01 || glow[m] === 0) {
+            paintCell(m, glow[m]);
+            painted[m] = glow[m];
+          }
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ---- Start button ----------------------------------------------------------
+  startBtn.addEventListener('click', async () => {
+    startBtn.disabled = true;
+    startBtn.textContent = 'Starting…';
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      });
+      pillEl.className = 'live';
+      statusEl.textContent = 'Listening · 15 – 19.5 kHz band';
+      readoutEl.textContent = 'listening…';
+      startBtn.textContent = 'Running';
+      startSpectrogram(stream);
+    } catch (err) {
+      pillEl.className = 'error';
+      statusEl.textContent = 'Microphone unavailable: ' + err.message;
+      startBtn.textContent = 'Start';
+      startBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
